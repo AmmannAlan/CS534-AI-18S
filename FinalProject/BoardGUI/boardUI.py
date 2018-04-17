@@ -10,6 +10,8 @@ EMPTY = 0
 BLACK = 1
 WHITE = 2
 PIECE = 34 ## Even Number
+MARGIN = 20
+GRID = 40
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPixmap, QIcon, QPalette, QPainter, QBrush
@@ -171,11 +173,12 @@ class DisplayMW(QMainWindow):
         if event.button() == Qt.LeftButton:
             print("Pressed")
 
-    def coordinate_transform_map2pixel(self):
+    def coordinate_transform_map2pixel(self,i,j):
 
         return
 
-    def coordinate_transform_pixel2map(self):
+    def coordinate_transform_pixel2map(self,x,y):
+
 
         return
 
