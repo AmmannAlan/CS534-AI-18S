@@ -94,8 +94,8 @@ class Ui_MainWindow(object):
         self.graphicsView.black = QPixmap(dirname + '/source/black.png')
         self.graphicsView.white = QPixmap(dirname + '/source/white.png')
 
-        self.graphicsView.setMouseTracking(True)
-        MainWindow.setMouseTracking(True)
+        #self.graphicsView.setMouseTracking(True)
+        #MainWindow.setMouseTracking(True)
         self.DrawBackground()
 
         self.retranslateUi(MainWindow)
@@ -143,9 +143,10 @@ class DisplayMW(QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.ui.graphicsView.setMouseTracking(True)
+        #self.ui.graphicsView.setMouseTracking(True)
+        #self.ui.graphicsView.setAttribute(QtCore.Qt.WA_MouseTracking)
         self.filter = Filter()
-        #self.ui.graphicsView.installEventFilter(self.filter)
+        self.ui.graphicsView.installEventFilter(self.filter)
         self.installEventFilter(self.filter)
         #### Black and White
 
@@ -154,6 +155,9 @@ class DisplayMW(QMainWindow):
         self.mouse_point.setScaledContents(True)
         self.mouse_point.setPixmap(self.ui.graphicsView.black)  # Black chess piece, human always hold
         self.mouse_point.setGeometry(270, 270, PIECE, PIECE)
+        #self.mouse_point.setMouseTracking(True)
+        self.mouse_point.raise_()
+        #self.setAttribute(QtCore.Qt.WA_MouseTracking)
 
         # settings for the mouse
         #self.mouse_point.raise_()
@@ -172,14 +176,15 @@ class DisplayMW(QMainWindow):
             piece.setVisible(True)  # Set Picture Visible
             piece.setScaledContents(True)  #
 
-        self.mouse_point.raise_()
+
+        #self.mouse_point.raise_()
         self.setMouseTracking(True)
-        self.show()
+        #self.show()
 
     def mouseMoveEvent(self, event):
-        if event.x() <= 760 and event.y() <= 780:
+        if event.x() <= 760 and event.y() <= 780 and event.y() >= 20:
             self.mouse_point.move(event.x() - PIECE/2,event.y() - PIECE/2)
-        #print("Moved")
+            #print("Moved")
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -192,7 +197,6 @@ class DisplayMW(QMainWindow):
                 print("Both Not None")
                 #print(self.chess_board.get_xy_on_logic_state(i,j))
 
-                ### 以下这句是有问题的
                 temp_state = self.chess_board.get_xy_on_logic_state(i,j)
                 if temp_state == EMPTY:  # 棋子落在空白处
                     #print("is Empty")
@@ -210,14 +214,15 @@ class DisplayMW(QMainWindow):
 
     def coordinate_transform_map2pixel(self,i,j):
 
-        return MARGIN + j * GRID - PIECE / 2, MARGIN + i * GRID - PIECE / 2
+        return MARGIN + j * GRID - PIECE / 2, 20 + MARGIN + i * GRID - PIECE / 2
         
 
 
     def coordinate_transform_pixel2map(self,x,y):
 
-        i, j = int(round((y - MARGIN) / GRID)), int(round((x - MARGIN) / GRID))
-        # 有MAGIN, 排除边缘位置导致 i,j 越界
+        i, j = int(round((y - MARGIN - 20) / GRID)), int(round((x - MARGIN) / GRID))
+
+
         if i < 0 or i >= 19 or j < 0 or j >= 19:
             return None, None
         else:
@@ -226,7 +231,7 @@ class DisplayMW(QMainWindow):
     def draw(self,i,j):
         x,y = self.coordinate_transform_map2pixel(i,j)
         print("x",x,"y",y)
-        print("x should:",20+j*40,"y should",20+i*40)
+        print("x should:",20+j*40,"y should",20 + 20 + i*40)
 
         if self.piece_now == BLACK:
             # place black chess
@@ -238,7 +243,7 @@ class DisplayMW(QMainWindow):
             self.piece_now = BLACK
             self.chess_board.draw_xy(i,j,WHITE)
 
-        self.pieces[self.step].setGeometry(x,y-PIECE/2,PIECE,PIECE)
+        self.pieces[self.step].setGeometry(x,y,PIECE,PIECE)
         self.step += 1
 
 
