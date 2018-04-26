@@ -17,9 +17,28 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPixmap, QIcon, QPalette, QPainter, QBrush
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import QLineF, QRectF, Qt
-from PyQt5.QtWidgets import QLabel, QMainWindow,QWidget
+from PyQt5.QtWidgets import QLabel, QMainWindow,QWidget,QMessageBox
 import os
+
 from chess_board import ChessBoard
+from GoAI import searcher
+
+class AI(QtCore.QThread):
+
+    finishSignal = QtCore.pyqtSignal(int, int)
+
+    # 构造函数里增加形参
+    def __init__(self, board, parent=None):
+        super(AI, self).__init__(parent)
+        self.board = board
+
+    # 重写 run() 函数
+    def run(self):
+        self.ai = searcher()
+        self.ai.board = self.board
+        score, x, y = self.ai.search(2, 2)
+        self.finishSignal.emit(x, y)
+
 
 class LaBel(QLabel):
     def __init__(self, parent):
@@ -187,29 +206,30 @@ class DisplayMW(QMainWindow):
             #print("Moved")
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.LeftButton and self.AI_down == True:
             x,y = event.x(),event.y()
-            print("Pressed","x:",x,"y:",y)
+            #print("Pressed","x:",x,"y:",y)
             i,j = self.coordinate_transform_pixel2map(x,y)
-            print("chess board i",i,"j ",j)
+            print("用户 chess board i",i,"j ",j)
 
             if not i is None and not j is None:
-                print("Both Not None")
+                #print("Both Not None")
                 #print(self.chess_board.get_xy_on_logic_state(i,j))
 
                 temp_state = self.chess_board.get_xy_on_logic_state(i,j)
                 if temp_state == EMPTY:  # 棋子落在空白处
                     #print("is Empty")
-
                     self.draw(i, j)
-                    print("i",i,"j",j)
-                    #self.ai_down = False
-                    #board = self.chessboard.board()
 
+                    #print("Drawing completed?")
+                    self.AI_down = False
+                    board = self.chess_board.board()
+
+                    #print("Creating AI Thread")
                     ## Create the AI thread
-                    #self.AI = AI(board)  # 新建线程对象，传入棋盘参数
-                    #self.AI.finishSignal.connect(self.AI_draw)  # 结束线程，传出参数
-                    #self.AI.start()  # run
+                    self.AI = AI(board)  # 新建线程对象，传入棋盘参数
+                    self.AI.finishSignal.connect(self.AI_draw)  # 结束线程，传出参数
+                    self.AI.start()  # run
 
 
     def coordinate_transform_map2pixel(self,i,j):
@@ -228,10 +248,20 @@ class DisplayMW(QMainWindow):
         else:
             return i, j
 
+    def AI_draw(self,i,j):
+
+        if self.step != 0:
+            self.draw(i, j)  # AI
+            self.x, self.y = self.coordinate_transform_map2pixel(i, j)
+        self.AI_down = True
+        self.update()
+
+
     def draw(self,i,j):
         x,y = self.coordinate_transform_map2pixel(i,j)
-        print("x",x,"y",y)
-        print("x should:",20+j*40,"y should",20 + 20 + i*40)
+        #print("Draw Function, draw")
+        #print("x",x,"y",y)
+        #print("x should:",20+j*40,"y should",20 + 20 + i*40)
 
         if self.piece_now == BLACK:
             # place black chess
@@ -245,6 +275,34 @@ class DisplayMW(QMainWindow):
 
         self.pieces[self.step].setGeometry(x,y,PIECE,PIECE)
         self.step += 1
+
+        #print("who is winner")
+        winner = self.chess_board.anyone_win(i,j)
+
+        if winner != EMPTY:
+            self.mouse_point.clear()
+            self.gameover(winner)
+
+    def gameover(self, winner):
+        if winner == BLACK:
+            #self.sound_win.play()
+            reply = QMessageBox.question(self, 'You Win!', 'Continue?',
+                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        else:
+            #.sound_defeated.play()
+            reply = QMessageBox.question(self, 'You Lost!', 'Continue?',
+                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+
+        if reply == QMessageBox.Yes:  # 复位
+            self.piece_now = BLACK
+            self.mouse_point.setPixmap(self.black)
+            self.step = 0
+            for piece in self.pieces:
+                piece.clear()
+            self.chess_board.reset()
+            self.update()
+        else:
+            self.close()
 
 
 
