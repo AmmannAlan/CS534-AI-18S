@@ -8,7 +8,7 @@ class evaluation(object):
     def __init__(self):
         self.POS = []
         for i in range(19):
-            row = [(7 - max(abs(i - 7), abs(j - 7))) for j in range(19)]
+            row = [(9 - max(abs(i - 9), abs(j - 9))) for j in range(19)]
             self.POS.append(tuple(row))
         self.POS = tuple(self.POS)
         self.STWO = 1  # 冲二

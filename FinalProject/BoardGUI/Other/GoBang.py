@@ -65,7 +65,7 @@ class GoBang(object):
         #self.can.create_image(700, 0, image=im)
 
         self.draw_board()
-        self.can.gridd(row=0, column=0)
+        self.can.grid(row=0, column=0)
         self.net_board = self.get_net_board()
         self.robot = Robot(self.board)
         #self.sgf = SGFflie()
