@@ -82,77 +82,62 @@ class Ui_MainWindow(object):
 
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-
         self.graphicsView = QtWidgets.QGraphicsView(self.centralwidget)
-        self.graphicsView.setGeometry(QtCore.QRect(0, 0, 760, 780))
+        self.graphicsView.setGeometry(QtCore.QRect(0, 0, 765, 765))
         self.graphicsView.setObjectName("graphicsView")
-        self.graphicsView.setMinimumSize(QtCore.QSize(760, 780))
-        self.graphicsView.setMaximumSize(QtCore.QSize(760, 780))
-
-        #self.mouse_point = LaBel(self)  # 将鼠标图片改为棋子
-        #self.mouse_point = LaBel(self)
+        self.graphicsView.setMinimumSize(QtCore.QSize(765, 765))
+        self.graphicsView.setMaximumSize(QtCore.QSize(765, 765))
 
         ### Add filter
         self.filter = Filter()
         self.graphicsView.installEventFilter(self.filter)
-        #self.installEventFilter(self.filter)
-
         self.scene = QtWidgets.QGraphicsScene()
-        #self.scene.addPixmap(QPixmap('C:\\Users\Jiaming Nie\Documents\GitHub\CS534-AI-18S\FinalProject\BoardGUI\source\background.jpg'))
         self.graphicsView.setScene(self.scene)
-        #self.graphicsView.setMouseTracking(True)
-        #self.graphicsView.setCursor(QtCore.Qt.ClosedHandCursor)
-        #self.graphicsView.setCursor(QtGui.QCursor(self.graphicsView.black))
 
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton.setGeometry(QtCore.QRect(790, 70, 91, 31))
         self.pushButton.setObjectName("pushButton")
+        self.pushButton.toggle()
+
         self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_2.setGeometry(QtCore.QRect(790, 122, 91, 31))
         self.pushButton_2.setObjectName("pushButton_2")
+
         self.radioButton = QtWidgets.QRadioButton(self.centralwidget)
         self.radioButton.setGeometry(QtCore.QRect(790, 190, 81, 31))
         self.radioButton.setObjectName("radioButton")
-        #self.radioButton_2 = QtWidgets.QRadioButton(self.centralwidget)
-        #self.radioButton_2.setGeometry(QtCore.QRect(790, 230, 82, 31))
-        #self.radioButton_2.setObjectName("radioButton_2")
+        _translate = QtCore.QCoreApplication.translate
+        self.radioButton.setText(_translate("MainWindow", "AI vs. Human"))
 
-        #self.radioButton_2.setChecked(False)
-        #self.radioButton.toggle()
-        #self.radioButton_2.toggle()
-        #self.radioButton_2.toggled.connect(lambda:self.btnState(self.radioButton_2))
-        #self.radioButton.toggled.connect(lambda:self.btnState(self.radioButton))
-
-        #self.radioButton_2.toggled.connect(self.on_radio_button_2_toggled)
+        self.radioButton_2 = QtWidgets.QRadioButton(self.centralwidget)
+        self.radioButton_2.setGeometry(QtCore.QRect(790, 230, 82, 31))
+        self.radioButton_2.setObjectName("radioButton_2")
+        self.radioButton_2.setText(_translate("MainWindow", "AI vs. AI"))
 
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 900, 21))
-        self.menubar.setObjectName("menubar")
-        self.menu_File_Menu = QtWidgets.QMenu(self.menubar)
-        self.menu_File_Menu.setObjectName("menu_File_Menu")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
-        self.actionSave_Game = QtWidgets.QAction(MainWindow)
-        self.actionSave_Game.setObjectName("actionSave_Game")
-        self.actionLoad_Game = QtWidgets.QAction(MainWindow)
-        self.actionLoad_Game.setObjectName("actionLoad_Game")
-        self.menu_File_Menu.addAction(self.actionSave_Game)
-        self.menu_File_Menu.addAction(self.actionLoad_Game)
-        self.menubar.addAction(self.menu_File_Menu.menuAction())
+        #self.menubar = QtWidgets.QMenuBar(MainWindow)
+        #self.menubar.setGeometry(QtCore.QRect(0, 0, 900, 21))
+        #self.menubar.setObjectName("menubar")
+        #self.menu_File_Menu = QtWidgets.QMenu(self.menubar)
+        #self.menu_File_Menu.setObjectName("menu_File_Menu")
+        #MainWindow.setMenuBar(self.menubar)
+        #self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        #self.statusbar.setObjectName("statusbar")
+        #MainWindow.setStatusBar(self.statusbar)
+        #self.actionSave_Game = QtWidgets.QAction(MainWindow)
+        #self.actionSave_Game.setObjectName("actionSave_Game")
+        #self.actionLoad_Game = QtWidgets.QAction(MainWindow)
+        #self.actionLoad_Game.setObjectName("actionLoad_Game")
+        #self.menu_File_Menu.addAction(self.actionSave_Game)
+        #self.menu_File_Menu.addAction(self.actionLoad_Game)
+        #self.menubar.addAction(self.menu_File_Menu.menuAction())
 
         ## Set the chess
         dirname = os.path.dirname(__file__)
         self.graphicsView.black = QPixmap(dirname + '/source/black.png')
         self.graphicsView.white = QPixmap(dirname + '/source/white.png')
-
         self.graphicsView.setCursor(QtGui.QCursor(self.graphicsView.black))
-        #self.graphicsView.setMouseTracking(True)
-        #MainWindow.setMouseTracking(True)
         self.DrawBackground()
-
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -161,11 +146,9 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "Chess Board GUI"))
         self.pushButton.setText(_translate("MainWindow", "Start"))
         self.pushButton_2.setText(_translate("MainWindow", "End"))
-        self.radioButton.setText(_translate("MainWindow", "AI vs. Player"))
-        #self.radioButton_2.setText(_translate("MainWindow", "AI vs. AI"))
-        self.menu_File_Menu.setTitle(_translate("MainWindow", "&File Menu"))
-        self.actionSave_Game.setText(_translate("MainWindow", "Save Game"))
-        self.actionLoad_Game.setText(_translate("MainWindow", "Load Game"))
+        #self.menu_File_Menu.setTitle(_translate("MainWindow", "&File Menu"))
+        #self.actionSave_Game.setText(_translate("MainWindow", "Save Game"))
+        #self.actionLoad_Game.setText(_translate("MainWindow", "Load Game"))
 
     def DrawBackground(self):
 
@@ -204,32 +187,21 @@ class DisplayMW(QMainWindow):
     def __init__(self):
 
         QMainWindow.__init__(self)
-
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        #self.ui.graphicsView.setMouseTracking(True)
-        #self.ui.graphicsView.setAttribute(QtCore.Qt.WA_MouseTracking)
         self.filter = Filter()
         self.ui.graphicsView.installEventFilter(self.filter)
         self.installEventFilter(self.filter)
         #### Black and White
 
-        #self.setCursor(Qt.PointingHandCursor)
         self.mouse_point = LaBel(self)  # 将鼠标图片改为棋子
-        #self.mouse_point.setScaledContents(True)
-        #self.mouse_point.setPixmap(self.ui.graphicsView.black)  # Black chess piece, human always hold
-        #self.mouse_point.setGeometry(270, 270, PIECE, PIECE)
-        #self.mouse_point.setMouseTracking(True)
-        #self.mouse_point.raise_()
-        #self.setAttribute(QtCore.Qt.WA_MouseTracking)
-
-        # settings for the mouse
-        #self.mouse_point.raise_()
-        #self.setMouseTracking(True)
         self.AI_down = True
-
         self.chess_board = ChessBoard()
         self.pieces = [LaBel(self) for i in range(361)] # All the chess pieces , 19*19 chess board
+
+        ### AI vs. AI locks?
+        self.a1_down = True
+        self.a2_down = True
 
         ## Black go first
         self.piece_now = BLACK
@@ -240,65 +212,50 @@ class DisplayMW(QMainWindow):
             piece.setVisible(True)  # Set Picture Visible
             piece.setScaledContents(True)  #
 
-
         #self.mouse_point.raise_()
         self.setMouseTracking(True)
-        #self.show()
 
-        self.ui.radioButton_2 = QtWidgets.QRadioButton(self.ui.centralwidget)
-        self.ui.radioButton_2.setGeometry(QtCore.QRect(790, 230, 82, 31))
-        self.ui.radioButton_2.setObjectName("radioButton_2")
-        _translate = QtCore.QCoreApplication.translate
-        self.ui.radioButton_2.setText(_translate("MainWindow", "AI vs. AI"))
+        # set the event of the radio buttons
+        self.ui.radioButton.toggled.connect(lambda:self.btnState(self.ui.radioButton))
         self.ui.radioButton_2.toggled.connect(lambda:self.btnState(self.ui.radioButton_2))
 
+        ## Set push button
+        self.ui.pushButton.clicked.connect(lambda:self.startButtonEvent(self.ui.pushButton))
 
-
+        # which mode
         self.ai_vs_ai = False
         self.ai_vs_player = False
 
-        self.ai_vs_player = self.IsAI_playerButtonChecked()
-
         # Game Have not started
         self.isStarted = False
-        #if self.ui.isAIPlayerButtonChecked == True:
-            #self.ai_vs_player = True
-
-
-    def mouseMoveEvent(self, event):
-
-        if event.x() <= 760 and event.y() <= 780 and event.y() >= 20:
-            self.mouse_point.move(event.x() - PIECE/2,event.y() - PIECE/2)
-            #print("Moved")
+        self.ai_mode_ = False
 
     def mousePressEvent(self, event):
 
-        if event.button() == Qt.LeftButton and self.AI_down == True:
-            x,y = event.x(),event.y()
-            #print("Pressed","x:",x,"y:",y)
-            i,j = self.coordinate_transform_pixel2map(x,y)
-            print("用户 chess board i",i,"j ",j)
+        if self.isStarted == True:
+            if self.ai_vs_player == True:
+                if event.button() == Qt.LeftButton and self.AI_down == True:
+                    x,y = event.x(),event.y()
+                    print("Pressed","x:",x,"y:",y)
+                    i,j = self.coordinate_transform_pixel2map(x,y)
 
-            if not i is None and not j is None:
-                #print("Both Not None")
-                #print(self.chess_board.get_xy_on_logic_state(i,j))
-
-                temp_state = self.chess_board.get_xy_on_logic_state(i,j)
-                if temp_state == EMPTY:  # 棋子落在空白处
-                    self.draw(i, j)
-                    self.AI_down = False
-                    board = self.chess_board.board()
-                    self.AI = AI(board)  # 新建线程对象，传入棋盘参数
-                    self.AI.finishSignal.connect(self.AI_draw)  # 结束线程，传出参数
-                    self.AI.start()  # run
+                    if not i is None and not j is None:
+                        temp_state = self.chess_board.get_xy_on_logic_state(i,j)
+                        if temp_state == EMPTY:  # 棋子落在空白处
+                            self.draw(i, j)
+                            self.AI_down = False
+                            board = self.chess_board.board()
+                            self.AI = AI(board)  # 新建线程对象，传入棋盘参数
+                            self.AI.finishSignal.connect(self.AI_draw)  # 结束线程，传出参数
+                            self.AI.start()  # run
 
     def coordinate_transform_map2pixel(self,i,j):
 
-        return MARGIN + j * GRID - PIECE / 2, 20 + MARGIN + i * GRID - PIECE / 2
+        return MARGIN + j * GRID - PIECE / 2, MARGIN + i * GRID - PIECE / 2
 
     def coordinate_transform_pixel2map(self,x,y):
 
-        i, j = int(round((y - MARGIN - 20) / GRID)), int(round((x - MARGIN) / GRID))
+        i, j = int(round((y - MARGIN) / GRID)), int(round((x - MARGIN) / GRID))
 
 
         if i < 0 or i >= 19 or j < 0 or j >= 19:
@@ -314,6 +271,18 @@ class DisplayMW(QMainWindow):
         self.AI_down = True
         self.update()
 
+    def AI_vs_AI_draw(self,i,j,number):
+
+        if self.step != 0:
+            self.draw(i,j)
+            self.x,self.y = self.coordinate_transform_map2pixel(i, j)
+
+        if number == 1:
+            self.a1_down = True
+        else:
+            self.a2_down = True
+
+        self.update()
 
     def draw(self,i,j):
         x,y = self.coordinate_transform_map2pixel(i,j)
@@ -341,6 +310,47 @@ class DisplayMW(QMainWindow):
             self.mouse_point.clear()
             self.gameover(winner)
 
+    def draw_2(self,i,j):
+
+        if self.piece_now == BLACK:
+            # place black chess
+            self.pieces[self.step].setPixmap(self.ui.graphicsView.black)
+            self.piece_now = WHITE
+            self.chess_board.draw_xy(i,j,BLACK)
+        else:
+            self.pieces[self.step].setPixmap(self.ui.graphicsView.white)
+            self.piece_now = BLACK
+            self.chess_board.draw_xy(i,j,WHITE)
+
+        self.pieces[self.step].setGeometry(x, y, PIECE, PIECE)
+        self.step += 1
+
+        # print("who is winner")
+        winner = self.chess_board.anyone_win(i, j)
+
+        ## define which wins by color
+        if winner != EMPTY:
+            self.mouse_point.clear()
+            self.ai_mode_gameover(winner)
+
+    def ai_mode_gameover(self,winner):
+
+        if winner == BLACK:
+            reply = QMessageBox.question(self, 'AI I wins!', 'Continue?',
+                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        else:
+            reply = QMessageBox.question(self, 'AI II wins!', 'Continue?',
+                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+
+        if reply == QMessageBox.Yes:  ## Reset
+            self.piece_now = BLACK
+            self.step = 0
+            for piece in self.pieces:
+                piece.clear()
+            self.chess_board.reset()
+            self.update()
+        else:
+            self.close()
 
     def gameover(self, winner):
         if winner == BLACK:
@@ -363,22 +373,45 @@ class DisplayMW(QMainWindow):
         else:
             self.close()
 
-    def IsAI_playerButtonChecked(self):
-        if self.ui.isAIPlayerButtonChecked == True:
-            return True
-
     def btnState(self, button):
-        if button.isChecked() == True:
-            print("AI vs Player Button is checked")
-            self.isAIPlayerButtonChecked = True
+        if button.text() == "AI vs. Human":
+            if button.isChecked() == True:
+                print("AI vs Human Button is checked")
+                self.ai_vs_player = True
+                #self.isAIPlayerButtonChecked = True
+        else:
+            if button.isChecked() == True:
+                print("AI vs. AI Button is checked")
+                self.ai_vs_ai = True
 
     def SelectColor(self):
 
         return
 
-    def startButton(self):
+    def startButtonEvent(self,button):
 
-        return
+        ### Enabled() function for push button
+        if button.isEnabled() == True:
+            #print("Push Button Start is clicked")
+            if self.isStarted == False:
+                self.isStarted = True
+                print("Push Button Start is clicked",self.isStarted)
+
+    def AI_vs_AI(self):
+
+        if self.isStarted == True:
+            if self.ai_vs_ai == True:
+
+                ini_x = 9
+                int_y = 9
+
+                number = 1 #ai_1's turn
+                self.AI_vs_AI_draw(ini_x,int_y,number)
+
+
+
+
+
 
 
 
