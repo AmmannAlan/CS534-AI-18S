@@ -19,6 +19,7 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtCore import QLineF, QRectF, Qt
 from PyQt5.QtWidgets import QLabel, QMainWindow,QWidget,QMessageBox
 import os
+import time
 
 from chess_board import ChessBoard
 from GoAI import searcher
@@ -38,6 +39,21 @@ class AI(QtCore.QThread):
         self.ai.board = self.board
         score, x, y = self.ai.search(2, 2)
         self.finishSignal.emit(x, y)
+
+class AI2(QtCore.QThread):
+
+    finishSignal = QtCore.pyqtSignal(int,int)
+
+    def __init__(self,board, turn, parent = None):
+        super(AI2,self).__init__(parent)
+        self.board = board
+        self.turn = turn
+
+    def run(self):
+        self.ai = searcher()
+        self.ai.board = self.board
+        score,x,y = self.ai.search(self.turn,2)
+        self.finishSignal.emit(x,y)
 
 
 class LaBel(QLabel):
@@ -99,9 +115,9 @@ class Ui_MainWindow(object):
         self.pushButton.setObjectName("pushButton")
         self.pushButton.toggle()
 
-        self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_2.setGeometry(QtCore.QRect(790, 122, 91, 31))
-        self.pushButton_2.setObjectName("pushButton_2")
+        # self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
+        # self.pushButton_2.setGeometry(QtCore.QRect(790, 122, 91, 31))
+        # self.pushButton_2.setObjectName("pushButton_2")
 
         self.radioButton = QtWidgets.QRadioButton(self.centralwidget)
         self.radioButton.setGeometry(QtCore.QRect(790, 190, 81, 31))
@@ -145,7 +161,7 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Chess Board GUI"))
         self.pushButton.setText(_translate("MainWindow", "Start"))
-        self.pushButton_2.setText(_translate("MainWindow", "End"))
+        #self.pushButton_2.setText(_translate("MainWindow", "End"))
         #self.menu_File_Menu.setTitle(_translate("MainWindow", "&File Menu"))
         #self.actionSave_Game.setText(_translate("MainWindow", "Save Game"))
         #self.actionLoad_Game.setText(_translate("MainWindow", "Load Game"))
@@ -221,6 +237,8 @@ class DisplayMW(QMainWindow):
 
         ## Set push button
         self.ui.pushButton.clicked.connect(lambda:self.startButtonEvent(self.ui.pushButton))
+        ## set the end button
+        #self.ui.pushButton_2.clicked.connect(lambda:self.ResetButtonEvent(self.ui.pushButton_2))
 
         # which mode
         self.ai_vs_ai = False
@@ -228,10 +246,9 @@ class DisplayMW(QMainWindow):
 
         # Game Have not started
         self.isStarted = False
-        self.ai_mode_ = False
+        self.ai_mode_ = True
 
     def mousePressEvent(self, event):
-
         if self.isStarted == True:
             if self.ai_vs_player == True:
                 if event.button() == Qt.LeftButton and self.AI_down == True:
@@ -248,6 +265,7 @@ class DisplayMW(QMainWindow):
                             self.AI = AI(board)  # 新建线程对象，传入棋盘参数
                             self.AI.finishSignal.connect(self.AI_draw)  # 结束线程，传出参数
                             self.AI.start()  # run
+
 
     def coordinate_transform_map2pixel(self,i,j):
 
@@ -271,25 +289,17 @@ class DisplayMW(QMainWindow):
         self.AI_down = True
         self.update()
 
-    def AI_vs_AI_draw(self,i,j,number):
+    def AI_vs_AI_draw(self,i,j):
 
         if self.step != 0:
-            self.draw(i,j)
+            self.draw_2(i,j)
             self.x,self.y = self.coordinate_transform_map2pixel(i, j)
-
-        if number == 1:
-            self.a1_down = True
-        else:
-            self.a2_down = True
 
         self.update()
 
+
     def draw(self,i,j):
         x,y = self.coordinate_transform_map2pixel(i,j)
-        #print("Draw Function, draw")
-        #print("x",x,"y",y)
-        #print("x should:",20+j*40,"y should",20 + 20 + i*40)
-
         if self.piece_now == BLACK:
             # place black chess
             self.pieces[self.step].setPixmap(self.ui.graphicsView.black)
@@ -302,16 +312,15 @@ class DisplayMW(QMainWindow):
 
         self.pieces[self.step].setGeometry(x,y,PIECE,PIECE)
         self.step += 1
-
-        #print("who is winner")
         winner = self.chess_board.anyone_win(i,j)
 
         if winner != EMPTY:
             self.mouse_point.clear()
             self.gameover(winner)
 
-    def draw_2(self,i,j):
 
+    def draw_2(self,i,j):
+        x, y = self.coordinate_transform_map2pixel(i, j)
         if self.piece_now == BLACK:
             # place black chess
             self.pieces[self.step].setPixmap(self.ui.graphicsView.black)
@@ -324,14 +333,16 @@ class DisplayMW(QMainWindow):
 
         self.pieces[self.step].setGeometry(x, y, PIECE, PIECE)
         self.step += 1
-
         # print("who is winner")
         winner = self.chess_board.anyone_win(i, j)
 
+        #print("Who is winner",winner)
         ## define which wins by color
         if winner != EMPTY:
-            self.mouse_point.clear()
+            self.ai_mode_ = False
+            #self.mouse_point.clear()
             self.ai_mode_gameover(winner)
+
 
     def ai_mode_gameover(self,winner):
 
@@ -389,7 +400,6 @@ class DisplayMW(QMainWindow):
         return
 
     def startButtonEvent(self,button):
-
         ### Enabled() function for push button
         if button.isEnabled() == True:
             #print("Push Button Start is clicked")
@@ -397,21 +407,73 @@ class DisplayMW(QMainWindow):
                 self.isStarted = True
                 print("Push Button Start is clicked",self.isStarted)
 
+                if self.ai_vs_ai == True:
+                    print("AI vs AI flag",self.ai_vs_ai)
+                    self.AI_vs_AI()
+
     def AI_vs_AI(self):
-
         if self.isStarted == True:
-            if self.ai_vs_ai == True:
+            #if self.ai_vs_ai == True:
+            ini_x = 9
+            ini_y = 9
+            # This step is for the initialization of the BLACK
+            # BLACK has started, a1_down should be false
+            print("Call the initial drawing fucntion")
+            #self.AI_vs_AI_draw(self,ini_x,ini_y)
 
-                ini_x = 9
-                int_y = 9
+            self.draw_2(ini_x,ini_y)
 
-                number = 1 #ai_1's turn
-                self.AI_vs_AI_draw(ini_x,int_y,number)
+            # ai_1 = searcher()
+            # ai_2 = searcher()
+
+            while self.ai_mode_ == True:
+
+                # 1 represents BLACK, WHITE Represents WHITE
+                # 2 is the depth
+
+                if self.a2_down == True:
+                    board = self.chess_board.board()
+                    self.ai_2 = AI2(board,2) # It's white's turn
+                    self.ai_2.finishSignal.connect(self.AI_vs_AI_draw)  # 结束线程，传出参数
+                    self.ai_2.start()  # run
+                    self.a2_down = False
+
+                if self.a1_down == True:
+                    board = self.chess_board.board()
+                    self.ai_1 = AI2(board,1)
+                    self.ai_1.finishSignal.connect(self.AI_vs_AI_draw)
+                    self.ai_1.start()
+                    self.a1_down = False
+
+
+                # ai_2.board = self.chess_board.board()
+                # score_2, x_2, y_2 = ai_2.search(2, 2)
+                # #time.sleep(3)
+                # self.draw_2(x_2,y_2)
+                # # time.sleep(3)
+                # print("Black :","x",x_2,"y",y_2,"score",score_2)
+                #
+                # ai_1.board = self.chess_board.board()
+                # score_1,x_1,y_1 = ai_1.search(1,2)
+                # self.draw_2(x_1,y_1)
+                # # time.sleep(3)
+                # print("White :", "x", x_1, "y", y_1, "score", score_1)
 
 
 
 
+    def ResetButtonEvent(self):
 
+        print("Reset")
+        self.piece_now = BLACK
+        self.step = 0
+
+        for piece in self.pieces:
+            piece.clear()
+
+        self.chess_board.reset()
+        self.update()
+        #self.__init__()
 
 
 
