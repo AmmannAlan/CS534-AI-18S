@@ -45,14 +45,17 @@ class Game(object):
 
                 
     def start(self):   
-        [p1,p2]=random.sample([1,2],2)
+        #[p1,p2]=random.sample([1,2],2)
+        [p1,p2] = [1,2]
         self.board.init_board()            
         ai1 = MCTS(self.board, [p1,p2], self.n_in_row, self.time)
-        #ai2 = MCTS(self.board, [p1, p2], self.n_in_row, self.time)                      
-        human = Human(self.board, p2)
+        ai2 = MCTS(self.board, [p1,p2], self.n_in_row, self.time)
+        #human = Human(self.board, p2)
+
         turn=[p1,p2]
-        players={p1:ai1,p2:human}
-        random.shuffle(turn) #randomly choose human or computer move firstly
+        #players={p1:ai1,p2:human}
+        players = {p1:ai1,p2:ai2}
+        #random.shuffle(turn) #randomly choose human or computer move firstly
         while True:
             p = turn.pop(0)
             turn.append(p)
@@ -64,11 +67,47 @@ class Game(object):
 
             print("%s move: %d,%d\n" % (player_in_turn,location[0], location[1]))
             self.board.update(p, move)
-            self.graphic(self.board, human, ai1)
+
+            #self.graphic(self.board, human, ai1)
+            #self.graphic(self.board,ai2,ai1)
             end, winner = self.game_end(ai1)
             if end:
                 if winner != -1:
                     
+                    print("Game end. Winner is", players[winner])
+                break
+
+    def start_2(self):
+        # [p1,p2]=random.sample([1,2],2)
+        [p1, p2] = [1, 2]
+        self.board.init_board()
+        ai1 = MCTS(self.board, [p1, p2], self.n_in_row, self.time)
+        ai2 = MCTS(self.board, [p1, p2], self.n_in_row, self.time)
+        # human = Human(self.board, p2)
+
+        turn = [p1, p2]
+        # players={p1:ai1,p2:human}
+        players = {p1: ai1, p2: ai2}
+        # random.shuffle(turn) #randomly choose human or computer move firstly
+        while True:
+            p = turn.pop(0)
+            turn.append(p)
+            player_in_turn = players[p]
+            print(players[p])
+            move = player_in_turn.get_action()
+
+            location = self.board.move_to_location(move)
+
+
+            print("%s move: %d,%d\n" % (player_in_turn, location[0], location[1]))
+            self.board.update(p, move)
+
+
+            # self.graphic(self.board, human, ai1)
+            # self.graphic(self.board,ai2,ai1)
+            end, winner = self.game_end(ai1)
+            if end:
+                if winner != -1:
                     print("Game end. Winner is", players[winner])
                 break
 
@@ -114,4 +153,7 @@ class Game(object):
 if __name__ == "__main__":
     board=Board()
     g=Game(board)
-    g.start()
+    g.start_2()
+    # turn = [1,2]
+    # t = turn.pop(0)
+    # print(turn,t)

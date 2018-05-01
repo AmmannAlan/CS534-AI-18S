@@ -9,8 +9,7 @@ class Board(object):
     """
     board for game
     """
-
-    def __init__(self, width=8, height=8, n_in_row=5):
+    def __init__(self, width=19, height=19, n_in_row=5):
         self.width = width
         self.height = height 
         self.states = {} # {location:player} record the current states of board
