@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 
-# evaluation: 棋盘评估类，给当前棋盘打分用
+# evaluation:
 # ----------------------------------------------------------------------
 class evaluation(object):
     def __init__(self):
@@ -11,34 +11,33 @@ class evaluation(object):
             row = [(9 - max(abs(i - 9), abs(j - 9))) for j in range(19)]
             self.POS.append(tuple(row))
         self.POS = tuple(self.POS)
-        self.STWO = 1  # 冲二
-        self.STHREE = 2  # 冲三
-        self.SFOUR = 3  # 冲四
-        self.TWO = 4  # 活二
-        self.THREE = 5  # 活三
-        self.FOUR = 6  # 活四
-        self.FIVE = 7  # 活五
-        self.DFOUR = 8  # 双四
-        self.FOURT = 9  # 四三
-        self.DTHREE = 10  # 双三
+        self.STWO = 1
+        self.STHREE = 2
+        self.SFOUR = 3
+        self.TWO = 4
+        self.THREE = 5
+        self.FOUR = 6
+        self.FIVE = 7
+        self.DFOUR = 8
+        self.FOURT = 9
+        self.DTHREE = 10
         self.NOTYPE = 11
-        self.ANALYSED = 255  # 已经分析过
-        self.TODO = 0  # 没有分析过
-        self.result = [0 for i in range(30)]  # 保存当前直线分析值
-        self.line = [0 for i in range(30)]  # 当前直线数据
-        self.record = []  # 全盘分析结果 [row][col][方向]
+        self.ANALYSED = 255
+        self.TODO = 0
+        self.result = [0 for i in range(30)]
+        self.line = [0 for i in range(30)]
+        self.record = []
         for i in range(19):
             self.record.append([])
             self.record[i] = []
             for j in range(19):
                 self.record[i].append([0, 0, 0, 0])
-        self.count = []  # 每种棋局的个数：count[黑棋/白棋][模式]
+        self.count = []
         for i in range(3):
             data = [0 for i in range(20)]
             self.count.append(data)
         self.reset()
 
-        # 复位数据
 
     def reset(self):
         TODO = self.TODO
@@ -56,7 +55,7 @@ class evaluation(object):
             count[2][i] = 0
         return 0
 
-        # 四个方向（水平，垂直，左斜，右斜）分析评估棋盘，再根据结果打分
+
 
     def evaluate(self, board, turn):
         score = self.__evaluate(board, turn)
@@ -73,25 +72,25 @@ class evaluation(object):
                     score += i
         return score
 
-        # 四个方向（水平，垂直，左斜，右斜）分析评估棋盘，再根据结果打分
+
 
     def __evaluate(self, board, turn):
         record, count = self.record, self.count
         TODO, ANALYSED = self.TODO, self.ANALYSED
         self.reset()
-        # 四个方向分析
+
         for i in range(19):
             boardrow = board[i]
             recordrow = record[i]
             for j in range(19):
                 if boardrow[j] != 0:
-                    if recordrow[j][0] == TODO:  # 水平没有分析过？
+                    if recordrow[j][0] == TODO:
                         self.__analysis_horizon(board, i, j)
-                    if recordrow[j][1] == TODO:  # 垂直没有分析过？
+                    if recordrow[j][1] == TODO:
                         self.__analysis_vertical(board, i, j)
-                    if recordrow[j][2] == TODO:  # 左斜没有分析过？
+                    if recordrow[j][2] == TODO:
                         self.__analysis_left(board, i, j)
-                    if recordrow[j][3] == TODO:  # 右斜没有分析过
+                    if recordrow[j][3] == TODO:
                         self.__analysis_right(board, i, j)
 
         FIVE, FOUR = self.FIVE, self.FOUR
@@ -99,7 +98,7 @@ class evaluation(object):
         SFOUR, STHREE, STWO = self.SFOUR, self.STHREE, self.STWO
         check = {}
 
-        # 分别对白棋黑棋计算：FIVE, FOUR, THREE, TWO等出现的次数
+
         for c in (FIVE, FOUR, SFOUR, THREE, STHREE, TWO, STWO):
             check[c] = 1
         for i in range(19):
@@ -111,26 +110,26 @@ class evaluation(object):
                         if ch in check:
                             count[stone][ch] += 1
 
-                            # 如果有五连则马上返回分数
+
         BLACK, WHITE = 1, 2
-        if turn == WHITE:  # 当前是白棋
+        if turn == WHITE:
             if count[BLACK][FIVE]:
                 return -9999
             if count[WHITE][FIVE]:
                 return 9999
-        else:  # 当前是黑棋
+        else:
             if count[WHITE][FIVE]:
                 return -9999
             if count[BLACK][FIVE]:
                 return 9999
 
-                # 如果存在两个冲四，则相当于有一个活四
+
         if count[WHITE][SFOUR] >= 2:
             count[WHITE][FOUR] += 1
         if count[BLACK][SFOUR] >= 2:
             count[BLACK][FOUR] += 1
 
-            # 具体打分
+
         wvalue, bvalue, win = 0, 0, 0
         if turn == WHITE:
             if count[WHITE][FOUR] > 0: return 9990
@@ -199,7 +198,7 @@ class evaluation(object):
             if count[WHITE][STWO]:
                 wvalue += count[WHITE][STWO]
 
-                # 加上位置权值，棋盘最中心点权值是7，往外一格-1，最外圈是0
+
         wc, bc = 0, 0
         for i in range(19):
             for j in range(19):
@@ -217,7 +216,7 @@ class evaluation(object):
 
         return bvalue - wvalue
 
-        # 分析横向
+
 
     def __analysis_horizon(self, board, i, j):
         line, result, record = self.line, self.result, self.record
@@ -230,8 +229,6 @@ class evaluation(object):
                 record[i][x][0] = result[x]
         return record[i][j][0]
 
-        # 分析横向
-
     def __analysis_vertical(self, board, i, j):
         line, result, record = self.line, self.result, self.record
         TODO = self.TODO
@@ -243,7 +240,6 @@ class evaluation(object):
                 record[x][j][1] = result[x]
         return record[i][j][1]
 
-        # 分析左斜
 
     def __analysis_left(self, board, i, j):
         line, result, record = self.line, self.result, self.record
@@ -264,7 +260,7 @@ class evaluation(object):
                 record[y + s][x + s][2] = result[s]
         return record[i][j][2]
 
-        # 分析右斜
+
 
     def __analysis_right(self, board, i, j):
         line, result = self.line, self.result
@@ -286,7 +282,6 @@ class evaluation(object):
                 record[y - s][x + s][3] = result[s]
         return record[i][j][3]
 
-        # 分析一条线：五四三二等棋型
 
     def analysis_line(self, line, record, num, pos):
         TODO, ANALYSED = self.TODO, self.ANALYSED
@@ -307,63 +302,62 @@ class evaluation(object):
         num -= 1
         xl = pos
         xr = pos
-        while xl > 0:  # 探索左边界
+        while xl > 0:
             if line[xl - 1] != stone: break
             xl -= 1
-        while xr < num:  # 探索右边界
+        while xr < num:
             if line[xr + 1] != stone: break
             xr += 1
         left_range = xl
         right_range = xr
-        while left_range > 0:  # 探索左边范围（非对方棋子的格子坐标）
+        while left_range > 0:
             if line[left_range - 1] == inverse: break
             left_range -= 1
-        while right_range < num:  # 探索右边范围
+        while right_range < num:
             if line[right_range + 1] == inverse: break
             right_range += 1
 
-            # 如果该直线范围小于 5，则直接返回
         if right_range - left_range < 4:
             for k in range(left_range, right_range + 1):
                 record[k] = ANALYSED
             return 0
 
-            # 设置已经分析过
+
         for k in range(xl, xr + 1):
             record[k] = ANALYSED
 
         srange = xr - xl
 
-        # 如果是 5连
+
         if srange >= 4:
             record[pos] = self.FIVE
             return self.FIVE
 
-            # 如果是 4连
+
         if srange == 3:
-            leftfour = False  # 是否左边是空格
+            leftfour = False
             if xl > 0:
-                if line[xl - 1] == 0:  # 活四
+                if line[xl - 1] == 0:
                     leftfour = True
             if xr < num:
                 if line[xr + 1] == 0:
                     if leftfour:
-                        record[pos] = self.FOUR  # 活四
+                        record[pos] = self.FOUR
                     else:
-                        record[pos] = self.SFOUR  # 冲四
+                        record[pos] = self.SFOUR
                 else:
                     if leftfour:
-                        record[pos] = self.SFOUR  # 冲四
+                        record[pos] = self.SFOUR
             else:
                 if leftfour:
-                    record[pos] = self.SFOUR  # 冲四
+                    record[pos] = self.SFOUR
             return record[pos]
 
-            # 如果是 3连
-        if srange == 2:  # 三连
-            left3 = False  # 是否左边是空格
+
+        if srange == 2:
+            left3 = False
             if xl > 0:
-                if line[xl - 1] == 0:  # 左边有气
+                if line[xl - 1] == 0:
                     if xl > 1 and line[xl - 2] == stone:
                         record[xl] = SFOUR
                         record[xl - 2] = ANALYSED
@@ -372,9 +366,9 @@ class evaluation(object):
                 elif xr == num or line[xr + 1] != 0:
                     return 0
             if xr < num:
-                if line[xr + 1] == 0:  # 右边有气
+                if line[xr + 1] == 0:
                     if xr < num - 1 and line[xr + 2] == stone:
-                        record[xr] = SFOUR  # XXX-X 相当于冲四
+                        record[xr] = SFOUR
                         record[xr + 2] = ANALYSED
                     elif left3:
                         record[xr] = THREE
@@ -391,11 +385,11 @@ class evaluation(object):
                     record[pos] = STHREE
             return record[pos]
 
-            # 如果是 2连
-        if srange == 1:  # 两连
+
+        if srange == 1:
             left2 = False
             if xl > 2:
-                if line[xl - 1] == 0:  # 左边有气
+                if line[xl - 1] == 0:
                     if line[xl - 2] == stone:
                         if line[xl - 3] == stone:
                             record[xl - 3] = ANALYSED
@@ -407,7 +401,7 @@ class evaluation(object):
                     else:
                         left2 = True
             if xr < num:
-                if line[xr + 1] == 0:  # 左边有气
+                if line[xr + 1] == 0:
                     if xr < num - 2 and line[xr + 2] == stone:
                         if line[xr + 3] == stone:
                             record[xr + 3] = ANALYSED
@@ -437,10 +431,10 @@ class evaluation(object):
         # ----------------------------------------------------------------------
 
 
-# DFS: 博弈树搜索
+# DFS:
 # ----------------------------------------------------------------------
 class searcher(object):
-    # 初始化
+
     def __init__(self):
         self.evaluator = evaluation()
         self.board = [[0 for n in range(19)] for i in range(19)]
@@ -448,7 +442,6 @@ class searcher(object):
         self.overvalue = 0
         self.maxdepth = 3
 
-        # 产生当前棋局的走法
 
     def genmove(self, turn):
         moves = []
@@ -463,55 +456,45 @@ class searcher(object):
         moves.reverse()
         return moves
 
-        # 递归搜索：返回最佳分数
+
 
     def __search(self, turn, depth, alpha, beta):
 
-        # 深度为零则评估棋盘并返回
+
         if depth <= 0:
             score = self.evaluator.evaluate(self.board, turn)
             return score
 
-            # 如果游戏结束则立马返回
+
         score = self.evaluator.evaluate(self.board, turn)
         if abs(score) >= 9999 and depth < self.maxdepth:
             return score
 
-            # 产生新的走法
+
         moves = self.genmove(turn)
         bestmove = None
 
-        # 枚举当前所有走法
+
         for score, row, col in moves:
 
-            # 标记当前走法到棋盘
             self.board[row][col] = turn
-
-            # 计算下一回合该谁走
             nturn = turn == 1 and 2 or 1
-
-            # 深度优先搜索，返回评分，走的行和走的列
             score = - self.__search(nturn, depth - 1, -beta, -alpha)
-
-            # 棋盘上清除当前走法
             self.board[row][col] = 0
-
-            # 计算最好分值的走法
-            # alpha/beta 剪枝
             if score > alpha:
                 alpha = score
                 bestmove = (row, col)
                 if alpha >= beta:
                     break
 
-                    # 如果是第一层则记录最好的走法
+
         if depth == self.maxdepth and bestmove:
             self.bestmove = bestmove
 
-            # 返回当前最好的分数，和该分数的对应走法
+
         return alpha
 
-        # 具体搜索：传入当前是该谁走(turn=1/2)，以及搜索深度(depth)
+
 
     def search(self, turn, depth=3):
         self.maxdepth = depth
